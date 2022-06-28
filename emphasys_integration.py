@@ -136,6 +136,27 @@ def _check_inspection_from_bob_ai(scheduled_date, full_address):
 
     return ret_val, response
 
+def _update_emphasys_inspection_id_bob(BOB_inspection_id, instance_id):
+    ''' 
+    function to check whether an inspection is available in the Bob.ai or not using instance id.
+    '''
+
+    params = {
+        'inspection_id': BOB_inspection_id
+    }
+    
+    headers = {
+        'Authorization': 'Bearer {}'.format(access_token)
+    }
+
+    payload = json.dumps({
+        "agency_instance_id": instance_id
+    })
+
+    ret_val, response = _make_rest_call(url=BOB_AI_UPDATE_INSTANCE_ID, params=params, headers=headers, data=payload, method="post")
+
+    return ret_val, response
+
 def _propose_available_date_time(scheduled_date, full_address, inspection_type):
     ''' 
     function to propose date and time for an inspection
@@ -249,7 +270,7 @@ while True:
 
     headers = {
     'Ocp-Apim-Subscription-Key': EMPHASYS_SUBSCRIPTION_KEY,
-    'x-ecs-client': 'bobai-test',
+    'x-ecs-client': EMPHASYS_ECS_CLIENT,
     'Cache-Control': 'no-cache'
     }
 
@@ -287,6 +308,11 @@ while True:
             inspection_type = inspection_type_mapping[unit['fkInspectionType']]
         else:
             inspection_type = None
+        
+        if unit.get('inspectionID'):
+            emphasys_inspection_id = unit['inspectionID']
+        else:
+            emphasys_inspection_id = None
 
         # check whether the inspection is available on BOB or not
         if scheduled_date and full_address:
@@ -294,6 +320,7 @@ while True:
 
             if not ret_val:
                 logger.debug("Error while checking inspection on bob. Error {}".format(response))
+                continue
             
             try:
                 total_count = response.get("total_count")
@@ -302,7 +329,19 @@ while True:
 
             if total_count:
                 logger.debug("inspection is already there")
-                continue
+                bob_inspection_list = response.get('data', [])
+                if emphasys_inspection_id:
+                    if bob_inspection_list:
+                        bob_inspection_instance_id = bob_inspection_list[0].get('agency_instance_id')
+                        if bob_inspection_instance_id == emphasys_inspection_id:
+                            logger.debug("Bob instance id and emphasys instance id matched for emphasys instance id: {}".format(emphasys_inspection_id))
+                            continue
+                        else:
+                            ret_val, response = _update_emphasys_inspection_id_bob(bob_inspection_list[0].get('ID'), emphasys_inspection_id)
+
+                            if not ret_val:
+                                logger.debug("Error while updating instance id to bob. continuing with the next inspection. Error {}".format(propose_slot_response))
+                                continue
             else:
                 # If inspection is not available propose date and time to create an inspection
                 ret_val, propose_slot_response = _propose_available_date_time(scheduled_date, full_address, inspection_type)
