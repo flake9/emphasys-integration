@@ -192,6 +192,7 @@ def _create_inspection(scheduled_date, full_address, worker_id, sequence, list_s
     if inspection_type:
         payload = json.dumps({
             'UnitAddress': full_address,
+            'InspectionType': inspection_type,
             'ScheduledDate': scheduled_date,
             'WorkerID': worker_id,
             'Sequence': sequence,
@@ -200,7 +201,6 @@ def _create_inspection(scheduled_date, full_address, worker_id, sequence, list_s
     else:
         payload = json.dumps({
         'UnitAddress': full_address,
-        'InspectionType': inspection_type,
         'ScheduledDate': scheduled_date,
         'WorkerID': worker_id,
         'Sequence': sequence,
@@ -251,14 +251,14 @@ while True:
     if not ret_val:
         logger.debug("Failed to create access token for BOB. Error: {}".format(access_token))
         break
-    
+
     inspection_type_mapping = {
         100001:'Annual',
         100002:'Initial',
         100003:'QC',
         100004:'Complaint'
     }
-    
+
     logger.debug("page number {}".format(page_number))
 
     params = {
@@ -267,6 +267,13 @@ while True:
         'Page': page_number,
         'PageSize': EMPHASYS_DEFAULT_PAGE_SIZE
     }
+
+    # params = {
+    #     'StartDate': "2021-05-10T17:18:04.03Z",
+    #     'EndDate': "2022-05-10T17:18:04.03Z",
+    #     'Page': page_number,
+    #     'PageSize': EMPHASYS_DEFAULT_PAGE_SIZE
+    # }
 
     headers = {
     'Ocp-Apim-Subscription-Key': EMPHASYS_SUBSCRIPTION_KEY,
@@ -303,6 +310,7 @@ while True:
 
         if scheduled_date:
             scheduled_date = datetime.strptime(scheduled_date, '%Y-%m-%dT%H:%M:%SZ').strftime('%m/%d/%Y')
+            # scheduled_date = "07/04/2022"
 
         if unit.get('fkInspectionType'):
             inspection_type = inspection_type_mapping[unit['fkInspectionType']]
@@ -313,6 +321,12 @@ while True:
             emphasys_inspection_id = unit['inspectionID']
         else:
             emphasys_inspection_id = None
+        
+        logger.debug("inspection full address {}".format(full_address))
+        logger.debug("inspection scheduled date {}".format(scheduled_date))
+        logger.debug("inspection inspection type {}".format(inspection_type))
+        logger.debug("inspection emphasys inspection id {}".format(emphasys_inspection_id))
+
 
         # check whether the inspection is available on BOB or not
         if scheduled_date and full_address:
