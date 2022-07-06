@@ -237,7 +237,6 @@ for inspection in bob_inspections_response.get('data', []):
 
         if inspection_result:
             instance_list['fkOverallResult'] = inspections_results_mapping[CUSTOMER][inspection_result]
-            logger.debug("overall result {}".format(instance_list['fkOverallResult']))
 
         if inspection_inspector and emphasys_inspectors.get(inspection_inspector):
             instance_list['fkInspector'] = emphasys_inspectors[inspection_inspector]
