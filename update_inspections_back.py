@@ -179,14 +179,28 @@ logger.debug("inspectors available on emphasys".format(emphasys_inspectors))
 
 
 inspections_results_mapping = {
-    "Pass": 100001,
-    "Fail": 100002,
-    "No access": 100005,
-    "Inconclusive": 100004,
-    "Fail - Self Certify": 100010,
-    "Fail - Emergency": 100003,
-    "Vacant": 100008,
-    "Canceled ": 100007
+    "Test":
+    {
+        "Pass": 100001,
+        "Fail": 100002,
+        "No access": 100005,
+        "Inconclusive": 100004,
+        "Fail - Self Certify": 100010,
+        "Fail - Emergency": 100003,
+        "Vacant": 100008,
+        "Canceled ": 100007
+    },
+    "HAKC":
+    {
+        "Pass": 100001,
+        "Fail": 100002,
+        "No access": 100002,
+        "Inconclusive": 100003,
+        "Fail - Self Certify": 100002,
+        "Fail - Emergency": 100002,
+        "Vacant": 100015,
+        "Canceled ": 100011
+    }
 }
 
 for inspection in bob_inspections_response.get('data', []):
@@ -222,7 +236,8 @@ for inspection in bob_inspections_response.get('data', []):
             instance_list = instance_list[0]
 
         if inspection_result:
-            instance_list['fkOverallResult'] = inspections_results_mapping[inspection_result]
+            instance_list['fkOverallResult'] = inspections_results_mapping[CUSTOMER][inspection_result]
+            logger.debug("overall result {}".format(instance_list['fkOverallResult']))
 
         if inspection_inspector and emphasys_inspectors.get(inspection_inspector):
             instance_list['fkInspector'] = emphasys_inspectors[inspection_inspector]
@@ -249,6 +264,7 @@ for inspection in bob_inspections_response.get('data', []):
                 continue
 
             logger.debug("API call to update inspection on emphasys success")
+        # Will need if need to inspection back to emphasys without results.
         # else:
 
         #     schedule_payload = {}

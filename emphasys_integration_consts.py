@@ -6,6 +6,7 @@ BOB_AI_PASSWORD = "Pegasus@123"
 #Instance Constants
 BOB_INSTANCE = "https://api-staging.bob.ai"
 EMPHASYS_ECS_CLIENT = "bobai-test"
+CUSTOMER = "HAKC"
 
 # Other constants
 BOB_AI_INSPECTION_GET_URL = "{}/api/inspections/get_list_inspection".format(BOB_INSTANCE)
