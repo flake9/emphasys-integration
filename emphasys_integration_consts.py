@@ -1,12 +1,12 @@
 # Credential constants
-EMPHASYS_SUBSCRIPTION_KEY = "2d6148c15e854302a1f813e7cd735c7d"
-BOB_AI_USER_ID = "bhargav@bob.ai"
-BOB_AI_PASSWORD = "Pegasus@123"
+EMPHASYS_SUBSCRIPTION_KEY = ""
+BOB_AI_USER_ID = ""
+BOB_AI_PASSWORD = ""
 
 #Instance Constants
 BOB_INSTANCE = "https://api-staging.bob.ai"
-EMPHASYS_ECS_CLIENT = "bobai-test"
-CUSTOMER = "HAKC"
+EMPHASYS_ECS_CLIENT = ""
+CUSTOMER = ""
 
 # Other constants
 BOB_AI_INSPECTION_GET_URL = "{}/api/inspections/get_list_inspection".format(BOB_INSTANCE)
